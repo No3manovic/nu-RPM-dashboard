@@ -68,10 +68,7 @@ let data = [];
 const viewConfig = {
   cv: {
     groups: [
-      {
-        name: "Store",
-        cols: ["Store"]
-      },
+      { name: "Store", cols: ["Store"] },
       {
         name: "Consumer voice",
         cols: [
@@ -79,10 +76,7 @@ const viewConfig = {
           "GAs target","GAs MTD","GAs MTD%","GAs Projection","GAs daily required"
         ]
       },
-      {
-        name: "Consumer Box",
-        cols: ["Consumer Box"]
-      }
+      { name: "Consumer Box", cols: ["Consumer Box"] }
     ]
   }
 };
@@ -107,11 +101,14 @@ function renderHeader(groups){
   let row2 = "<tr>";
 
   groups.forEach(g => {
-    row1 += `<th colspan="${g.cols.length}">${g.name}</th>`;
-
-    g.cols.forEach(c => {
-      row2 += `<th>${c}</th>`;
-    });
+    if(g.cols.length === 1){
+      row1 += `<th rowspan="2">${g.name}</th>`;
+    } else {
+      row1 += `<th colspan="${g.cols.length}">${g.name}</th>`;
+      g.cols.forEach(c => {
+        row2 += `<th>${c}</th>`;
+      });
+    }
   });
 
   row1 += "</tr>";
