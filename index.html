@@ -4,10 +4,46 @@
   <title>RPM Dashboard</title>
   <style>
     body { font-family: Arial; background:#f4f6f9; padding:20px; text-align:center; }
-    table { margin:auto; border-collapse:collapse; background:#fff; }
-    th,td { border:1px solid #999; padding:6px 10px; }
-    th { background:#1a56a0; color:#fff; }
-    select { padding:8px; margin-bottom:15px; }
+
+    h2 { color:#1a56a0; }
+
+    .controls { margin-bottom:15px; }
+
+    select, button {
+      padding:8px 12px;
+      font-size:14px;
+      margin:5px;
+    }
+
+    button {
+      background:#1a56a0;
+      color:#fff;
+      border:none;
+      cursor:pointer;
+      border-radius:5px;
+    }
+
+    table {
+      margin:auto;
+      border-collapse:collapse;
+      background:#fff;
+      width:90%;
+    }
+
+    th,td {
+      border:1px solid #999;
+      padding:6px 10px;
+      text-align:center;
+    }
+
+    th {
+      background:#1a56a0;
+      color:#fff;
+    }
+
+    .red { background:#ff4d4d; color:#fff; }
+    .yellow { background:#ffd633; }
+    .green { background:#00b050; color:#fff; }
   </style>
 </head>
 
@@ -15,14 +51,17 @@
 
 <h2>RPM Dashboard</h2>
 
-<select id="view" onchange="renderTable()">
-  <option value="overall">Overall</option>
-  <option value="cv">Consumer Voice</option>
-  <option value="epu">EPU</option>
-  <option value="terminal">Terminal</option>
-  <option value="home">AT-Home</option>
-  <option value="adsl">ADSL</option>
-</select>
+<div class="controls">
+  <select id="view">
+    <option value="overall">Overall</option>
+    <option value="cv">Consumer Voice</option>
+    <option value="epu">EPU</option>
+    <option value="terminal">Terminal</option>
+    <option value="adsl">ADSL</option>
+  </select>
+
+  <button onclick="renderTable()">Show</button>
+</div>
 
 <table id="table">
   <thead></thead>
@@ -35,13 +74,40 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9f
 let data = [];
 
 const views = {
-  overall: ["store","target","mtd","mtd_pct"],
-  cv: ["store","target","mtd","mtd_pct"],
-  epu: ["store","target","mtd","mtd_pct"],
-  terminal: ["store","target","mtd","mtd_pct"],
-  home: ["store","target","mtd","mtd_pct"],
-  adsl: ["store","target","mtd","mtd_pct"]
+  overall: [
+    "Store",
+    "Points target","Points MTD","Points MTD%",
+    "GAs target","GAs MTD","GAs MTD%",
+    "Terminal target","Terminal MTD","Terminal MTD%",
+    "ADSL target","ADSL MTD","ADSL MTD%"
+  ],
+
+  cv: [
+    "Store",
+    "Points target","Points MTD","Points MTD%","Points Projection","Points daily required"
+  ],
+
+  epu: [
+    "Store",
+    "GAs target","GAs MTD","GAs MTD%","GAs Projection","GAs daily required"
+  ],
+
+  terminal: [
+    "Store",
+    "Terminal target","Terminal MTD","Terminal MTD%","Terminal daily required"
+  ],
+
+  adsl: [
+    "Store",
+    "ADSL target","ADSL MTD","ADSL MTD%","ADSL daily required"
+  ]
 };
+
+function getClass(pct){
+  if(pct < 90) return "red";
+  if(pct < 100) return "yellow";
+  return "green";
+}
 
 async function loadData(){
   const res = await fetch(API_URL);
@@ -69,13 +135,14 @@ function renderTable(){
     let row = "<tr>";
 
     cols.forEach(c => {
-      let val = item[c] || "";
+      let val = item[c] ?? "";
 
-      if(c === "mtd_pct"){
-        val = val ? Math.round(val * 100) + "%" : "";
+      if(c.includes("%") && val !== ""){
+        let pct = val * 100;
+        row += `<td class="${getClass(pct)}">${Math.round(pct)}%</td>`;
+      } else {
+        row += `<td>${val}</td>`;
       }
-
-      row += `<td>${val}</td>`;
     });
 
     row += "</tr>";
