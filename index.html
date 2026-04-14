@@ -3,43 +3,11 @@
 <head>
   <title>RPM Dashboard</title>
   <style>
-    body {
-      font-family: Arial;
-      background: #f4f6f9;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h2 {
-      color: #1a56a0;
-    }
-
-    table {
-      margin: auto;
-      border-collapse: collapse;
-      width: 70%;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    th {
-      background: #1a56a0;
-      color: white;
-      padding: 10px;
-    }
-
-    td {
-      padding: 8px;
-      border: 1px solid #ddd;
-    }
-
-    tr:hover {
-      background: #f1f1f1;
-    }
-
-    .red { background: #ff4d4d; color: white; }
-    .yellow { background: #ffd633; }
-    .green { background: #00b050; color: white; }
+    body { font-family: Arial; background:#f4f6f9; padding:20px; text-align:center; }
+    table { margin:auto; border-collapse:collapse; background:#fff; }
+    th,td { border:1px solid #999; padding:6px 10px; }
+    th { background:#1a56a0; color:#fff; }
+    select { padding:8px; margin-bottom:15px; }
   </style>
 </head>
 
@@ -47,48 +15,71 @@
 
 <h2>RPM Dashboard</h2>
 
+<select id="view" onchange="renderTable()">
+  <option value="overall">Overall</option>
+  <option value="cv">Consumer Voice</option>
+  <option value="epu">EPU</option>
+  <option value="terminal">Terminal</option>
+  <option value="home">AT-Home</option>
+  <option value="adsl">ADSL</option>
+</select>
+
 <table id="table">
-  <thead>
-    <tr>
-      <th>Store</th>
-      <th>Target</th>
-      <th>MTD</th>
-      <th>%</th>
-    </tr>
-  </thead>
+  <thead></thead>
   <tbody></tbody>
 </table>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9fSQtaOxaFHcdI7A-YcwRhmEqGWBux8WyGZc9CgCtZmOXB/exec";
 
-function getClass(pct){
-  if(pct < 90) return "red";
-  if(pct < 100) return "yellow";
-  return "green";
-}
+let data = [];
+
+const views = {
+  overall: ["store","target","mtd","mtd_pct"],
+  cv: ["store","target","mtd"],
+  epu: ["store","target","mtd"],
+  terminal: ["store","target"],
+  home: ["store","target"],
+  adsl: ["store","target"]
+};
 
 async function loadData(){
   const res = await fetch(API_URL);
   const json = await res.json();
-  const data = json.data;
+  data = json.data;
+  renderTable();
+}
 
+function renderTable(){
+  const view = document.getElementById("view").value;
+  const cols = views[view];
+
+  const thead = document.querySelector("#table thead");
   const tbody = document.querySelector("#table tbody");
+
+  thead.innerHTML = "";
   tbody.innerHTML = "";
 
+  let headerRow = "<tr>";
+  cols.forEach(c => headerRow += `<th>${c}</th>`);
+  headerRow += "</tr>";
+  thead.innerHTML = headerRow;
+
   data.forEach(item => {
-    const tr = document.createElement("tr");
+    let row = "<tr>";
 
-    const pct = item.mtd_pct ? item.mtd_pct * 100 : 0;
+    cols.forEach(c => {
+      let val = item[c] || "";
 
-    tr.innerHTML = `
-      <td>${item.store}</td>
-      <td>${item.target || ""}</td>
-      <td>${item.mtd || ""}</td>
-      <td class="${getClass(pct)}">${Math.round(pct)}%</td>
-    `;
+      if(c === "mtd_pct"){
+        val = Math.round(val * 100) + "%";
+      }
 
-    tbody.appendChild(tr);
+      row += `<td>${val}</td>`;
+    });
+
+    row += "</tr>";
+    tbody.innerHTML += row;
   });
 }
 
