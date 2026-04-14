@@ -6,11 +6,8 @@
     body { font-family: Arial; background:#f4f6f9; padding:20px; text-align:center; }
     h2 { color:#1a56a0; }
 
-    .controls { margin-bottom:15px; }
-
     select, button {
       padding:8px 12px;
-      font-size:14px;
       margin:5px;
     }
 
@@ -18,15 +15,15 @@
       background:#1a56a0;
       color:#fff;
       border:none;
-      cursor:pointer;
       border-radius:5px;
+      cursor:pointer;
     }
 
     table {
       margin:auto;
       border-collapse:collapse;
-      background:#fff;
       width:95%;
+      background:#fff;
     }
 
     th,td {
@@ -37,9 +34,9 @@
 
     th { background:#1a56a0; color:#fff; }
 
-    .red { background:#ff4d4d; color:#fff; }
-    .yellow { background:#ffd633; }
-    .green { background:#00b050; color:#fff; }
+    .red { background:red; color:#fff; }
+    .yellow { background:yellow; }
+    .green { background:green; color:#fff; }
   </style>
 </head>
 
@@ -47,13 +44,15 @@
 
 <h2>RPM Dashboard</h2>
 
-<div class="controls">
-  <select id="view">
-    <option value="cv">Consumer Voice</option>
-  </select>
+<select id="view">
+  <option value="cv">Consumer Voice</option>
+  <option value="epu">EPU</option>
+  <option value="terminal">Terminal</option>
+  <option value="home">AT-Home & Gated Community</option>
+  <option value="adsl">ADSL GAs</option>
+</select>
 
-  <button onclick="renderTable()">Show</button>
-</div>
+<button onclick="renderTable()">Show</button>
 
 <table id="table">
   <thead></thead>
@@ -65,25 +64,60 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9f
 
 let data = [];
 
-const viewConfig = {
+const views = {
+
   cv: {
-    groups: [
-      { name: "Store", cols: ["Store"] },
-      {
-        name: "Consumer voice",
-        cols: [
-          "Points target","Points MTD","Points MTD%","Points Projection","Points daily required",
-          "GAs target","GAs MTD","GAs MTD%","GAs Projection","GAs daily required"
-        ]
-      },
-      { name: "Consumer Box", cols: ["Consumer Box"] }
+    title: "Consumer voice",
+    cols: [
+      "Store",
+      "Points target","Points MTD","Points MTD%","Points Projection","Points daily required",
+      "GAs target","GAs MTD","GAs MTD%","GAs Projection","GAs daily required",
+      "Consumer Box"
+    ]
+  },
+
+  epu: {
+    title: "EPU",
+    cols: [
+      "Store",
+      "Points target","Points MTD","Points MTD%","Points Projection","Points daily required",
+      "GAs target","GAs MTD","GAs MTD%","GAs Projection",
+      "EPU Box"
+    ]
+  },
+
+  terminal: {
+    title: "Terminal",
+    cols: [
+      "Store",
+      "Terminal target","Terminal MTD","Terminal MTD%","Terminal daily required",
+      "Terminal Projection"
+    ]
+  },
+
+  home: {
+    title: "AT-Home & Gated Community",
+    cols: [
+      "Store",
+      "Points target","Points MTD","Points MTD%","Points daily required",
+      "AT-Home & Gated Community Box"
+    ]
+  },
+
+  adsl: {
+    title: "ADSL GAs",
+    cols: [
+      "Store",
+      "ADSL target","ADSL MTD","ADSL MTD%","ADSL daily required",
+      "ADSL Projection"
     ]
   }
+
 };
 
-function getClass(pct){
-  if(pct < 90) return "red";
-  if(pct < 100) return "yellow";
+function getClass(p){
+  if(p < 90) return "red";
+  if(p < 100) return "yellow";
   return "green";
 }
 
@@ -93,61 +127,45 @@ async function loadData(){
   data = json.data;
 }
 
-function renderHeader(groups){
+function renderTable(){
+  const v = document.getElementById("view").value;
+  const config = views[v];
+
   const thead = document.querySelector("#table thead");
-  thead.innerHTML = "";
-
-  let row1 = "<tr>";
-  let row2 = "<tr>";
-
-  groups.forEach(g => {
-    if(g.cols.length === 1){
-      row1 += `<th rowspan="2">${g.name}</th>`;
-    } else {
-      row1 += `<th colspan="${g.cols.length}">${g.name}</th>`;
-      g.cols.forEach(c => {
-        row2 += `<th>${c}</th>`;
-      });
-    }
-  });
-
-  row1 += "</tr>";
-  row2 += "</tr>";
-
-  thead.innerHTML = row1 + row2;
-}
-
-function renderBody(groups){
   const tbody = document.querySelector("#table tbody");
+
+  thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  data.forEach(item => {
-    let row = "<tr>";
+  // Row 1 (Title)
+  let r1 = `<tr><th rowspan="2">Store</th><th colspan="${config.cols.length-1}">${config.title}</th></tr>`;
 
-    groups.forEach(g => {
-      g.cols.forEach(c => {
-        let val = item[c] ?? "";
+  // Row 2 (columns)
+  let r2 = "<tr>";
+  config.cols.slice(1).forEach(c=>{
+    r2 += `<th>${c}</th>`;
+  });
+  r2 += "</tr>";
 
-        if(c.includes("%") && val !== ""){
-          let pct = val * 100;
-          row += `<td class="${getClass(pct)}">${Math.round(pct)}%</td>`;
-        } else {
-          row += `<td>${val}</td>`;
-        }
-      });
+  thead.innerHTML = r1 + r2;
+
+  data.forEach(row=>{
+    let tr = "<tr>";
+
+    config.cols.forEach(c=>{
+      let val = row[c] ?? "";
+
+      if(c.includes("%") && val !== ""){
+        let pct = val * 100;
+        tr += `<td class="${getClass(pct)}">${Math.round(pct)}%</td>`;
+      } else {
+        tr += `<td>${val}</td>`;
+      }
     });
 
-    row += "</tr>";
-    tbody.innerHTML += row;
+    tr += "</tr>";
+    tbody.innerHTML += tr;
   });
-}
-
-function renderTable(){
-  const view = document.getElementById("view").value;
-  const config = viewConfig[view];
-
-  renderHeader(config.groups);
-  renderBody(config.groups);
 }
 
 loadData();
