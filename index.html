@@ -36,11 +36,11 @@ let data = [];
 
 const views = {
   overall: ["store","target","mtd","mtd_pct"],
-  cv: ["store","target","mtd"],
-  epu: ["store","target","mtd"],
-  terminal: ["store","target"],
-  home: ["store","target"],
-  adsl: ["store","target"]
+  cv: ["store","target","mtd","mtd_pct"],
+  epu: ["store","target","mtd","mtd_pct"],
+  terminal: ["store","target","mtd","mtd_pct"],
+  home: ["store","target","mtd","mtd_pct"],
+  adsl: ["store","target","mtd","mtd_pct"]
 };
 
 async function loadData(){
@@ -72,7 +72,7 @@ function renderTable(){
       let val = item[c] || "";
 
       if(c === "mtd_pct"){
-        val = Math.round(val * 100) + "%";
+        val = val ? Math.round(val * 100) + "%" : "";
       }
 
       row += `<td>${val}</td>`;
