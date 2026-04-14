@@ -49,12 +49,7 @@
 
 <div class="controls">
   <select id="view">
-    <option value="overall">Overall</option>
     <option value="cv">Consumer Voice</option>
-    <option value="epu">EPU</option>
-    <option value="terminal">Terminal</option>
-    <option value="home">AT-Home</option>
-    <option value="adsl">ADSL</option>
   </select>
 
   <button onclick="renderTable()">Show</button>
@@ -70,20 +65,27 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9f
 
 let data = [];
 
-const views = {
-  cv: range(0,11),          // A:L
-  epu: [0, ...range(12,21)],// A + M:V
-  terminal: [0, ...range(22,26)], // A + W:AA
-  home: [0, ...range(27,31)],     // A + AB:AF
-  adsl: [0, ...range(32,36)],     // A + AG:AK
-  overall: [0,4,9,11,15,20,21,26,31,36,37,38]
+const viewConfig = {
+  cv: {
+    groups: [
+      {
+        name: "Store",
+        cols: ["Store"]
+      },
+      {
+        name: "Consumer voice",
+        cols: [
+          "Points target","Points MTD","Points MTD%","Points Projection","Points daily required",
+          "GAs target","GAs MTD","GAs MTD%","GAs Projection","GAs daily required"
+        ]
+      },
+      {
+        name: "Consumer Box",
+        cols: ["Consumer Box"]
+      }
+    ]
+  }
 };
-
-function range(start,end){
-  let arr=[];
-  for(let i=start;i<=end;i++) arr.push(i);
-  return arr;
-}
 
 function getClass(pct){
   if(pct < 90) return "red";
@@ -97,45 +99,58 @@ async function loadData(){
   data = json.data;
 }
 
-function renderTable(){
-  const view = document.getElementById("view").value;
-  const colsIndex = views[view];
-
+function renderHeader(groups){
   const thead = document.querySelector("#table thead");
-  const tbody = document.querySelector("#table tbody");
-
   thead.innerHTML = "";
-  tbody.innerHTML = "";
 
-  if(!data.length) return;
+  let row1 = "<tr>";
+  let row2 = "<tr>";
 
-  const headers = Object.keys(data[0]);
+  groups.forEach(g => {
+    row1 += `<th colspan="${g.cols.length}">${g.name}</th>`;
 
-  let headerRow = "<tr>";
-  colsIndex.forEach(i => {
-    headerRow += `<th>${headers[i] || ""}</th>`;
+    g.cols.forEach(c => {
+      row2 += `<th>${c}</th>`;
+    });
   });
-  headerRow += "</tr>";
-  thead.innerHTML = headerRow;
+
+  row1 += "</tr>";
+  row2 += "</tr>";
+
+  thead.innerHTML = row1 + row2;
+}
+
+function renderBody(groups){
+  const tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
 
   data.forEach(item => {
     let row = "<tr>";
-    const values = Object.values(item);
 
-    colsIndex.forEach(i => {
-      let val = values[i] ?? "";
+    groups.forEach(g => {
+      g.cols.forEach(c => {
+        let val = item[c] ?? "";
 
-      if(headers[i] && headers[i].includes("%") && val !== ""){
-        let pct = val * 100;
-        row += `<td class="${getClass(pct)}">${Math.round(pct)}%</td>`;
-      } else {
-        row += `<td>${val}</td>`;
-      }
+        if(c.includes("%") && val !== ""){
+          let pct = val * 100;
+          row += `<td class="${getClass(pct)}">${Math.round(pct)}%</td>`;
+        } else {
+          row += `<td>${val}</td>`;
+        }
+      });
     });
 
     row += "</tr>";
     tbody.innerHTML += row;
   });
+}
+
+function renderTable(){
+  const view = document.getElementById("view").value;
+  const config = viewConfig[view];
+
+  renderHeader(config.groups);
+  renderBody(config.groups);
 }
 
 loadData();
