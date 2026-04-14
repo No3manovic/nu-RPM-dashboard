@@ -2,12 +2,52 @@
 <html>
 <head>
   <title>RPM Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #1a56a0;
+    }
+
+    table {
+      margin: auto;
+      border-collapse: collapse;
+      width: 70%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th {
+      background: #1a56a0;
+      color: white;
+      padding: 10px;
+    }
+
+    td {
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
+
+    tr:hover {
+      background: #f1f1f1;
+    }
+
+    .red { background: #ff4d4d; color: white; }
+    .yellow { background: #ffd633; }
+    .green { background: #00b050; color: white; }
+  </style>
 </head>
+
 <body>
 
 <h2>RPM Dashboard</h2>
 
-<table border="1" id="table">
+<table id="table">
   <thead>
     <tr>
       <th>Store</th>
@@ -22,6 +62,12 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9fSQtaOxaFHcdI7A-YcwRhmEqGWBux8WyGZc9CgCtZmOXB/exec";
 
+function getClass(pct){
+  if(pct < 90) return "red";
+  if(pct < 100) return "yellow";
+  return "green";
+}
+
 async function loadData(){
   const res = await fetch(API_URL);
   const json = await res.json();
@@ -33,11 +79,13 @@ async function loadData(){
   data.forEach(item => {
     const tr = document.createElement("tr");
 
+    const pct = item.mtd_pct ? item.mtd_pct * 100 : 0;
+
     tr.innerHTML = `
       <td>${item.store}</td>
-      <td>${item.target}</td>
-      <td>${item.mtd}</td>
-      <td>${Math.round(item.mtd_pct * 100)}%</td>
+      <td>${item.target || ""}</td>
+      <td>${item.mtd || ""}</td>
+      <td class="${getClass(pct)}">${Math.round(pct)}%</td>
     `;
 
     tbody.appendChild(tr);
