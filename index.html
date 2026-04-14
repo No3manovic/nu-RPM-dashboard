@@ -6,10 +6,7 @@
     body { font-family: Arial; background:#f4f6f9; padding:20px; text-align:center; }
     h2 { color:#1a56a0; }
 
-    select, button {
-      padding:8px 12px;
-      margin:5px;
-    }
+    select, button { padding:8px 12px; margin:5px; }
 
     button {
       background:#1a56a0;
@@ -63,6 +60,14 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9fSQtaOxaFHcdI7A-YcwRhmEqGWBux8WyGZc9CgCtZmOXB/exec";
 
 let data = [];
+
+const percentCols = [
+  "Points MTD%","Points Projection",
+  "GAs MTD%","GAs Projection",
+  "Terminal MTD%","Terminal Projection",
+  "ADSL MTD%","ADSL Projection",
+  "AT-Home & Gated Community Box"
+];
 
 const views = {
 
@@ -139,7 +144,6 @@ function renderTable(){
 
   const lastCol = config.cols[config.cols.length - 1];
 
-  // HEADER
   let r1 = `<tr>
     <th rowspan="2">Store</th>
     <th colspan="${config.cols.length - 2}">${config.title}</th>
@@ -154,18 +158,17 @@ function renderTable(){
 
   thead.innerHTML = r1 + r2;
 
-  // BODY
   data.forEach(row=>{
     let tr = "<tr>";
 
     config.cols.forEach(c=>{
-      let val = row[c] ?? "";
+      let val = row[c];
 
-      if(c.includes("%") && val !== ""){
+      if(percentCols.includes(c) && val !== "" && val != null){
         let pct = val * 100;
         tr += `<td class="${getClass(pct)}">${Math.round(pct)}%</td>`;
       } else {
-        tr += `<td>${val}</td>`;
+        tr += `<td>${val ?? ""}</td>`;
       }
     });
 
