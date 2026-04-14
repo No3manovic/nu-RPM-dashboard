@@ -137,18 +137,24 @@ function renderTable(){
   thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  // Row 1 (Title)
-  let r1 = `<tr><th rowspan="2">Store</th><th colspan="${config.cols.length-1}">${config.title}</th></tr>`;
+  const lastCol = config.cols[config.cols.length - 1];
 
-  // Row 2 (columns)
+  // HEADER
+  let r1 = `<tr>
+    <th rowspan="2">Store</th>
+    <th colspan="${config.cols.length - 2}">${config.title}</th>
+    <th rowspan="2">${lastCol}</th>
+  </tr>`;
+
   let r2 = "<tr>";
-  config.cols.slice(1).forEach(c=>{
+  config.cols.slice(1, -1).forEach(c=>{
     r2 += `<th>${c}</th>`;
   });
   r2 += "</tr>";
 
   thead.innerHTML = r1 + r2;
 
+  // BODY
   data.forEach(row=>{
     let tr = "<tr>";
 
