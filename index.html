@@ -50,9 +50,10 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9f
 let data = [];
 
 const percentCols = [
-  "Points MTD%","Points Projection",
-  "GAs MTD%","GAs Projection",
-  "EPU Points Projection",
+  "CV Points MTD%","CV Points Projection",
+  "CV GAs MTD%","CV GAs Projection",
+  "EPU Points MTD%","EPU Points Projection",
+  "EPU GAs MTD%","EPU GAs Projection",
   "Terminal MTD%","Terminal Projection",
   "AT-Home MTD%",
   "ADSL MTD%","ADSL Projection",
@@ -66,8 +67,8 @@ const views = {
     title: "Consumer voice",
     cols: [
       "Store",
-      "Points target","Points MTD","Points MTD%","Points Projection","Points daily required",
-      "GAs target","GAs MTD","GAs MTD%","GAs Projection","GAs daily required",
+      "CV Points target","CV Points MTD","CV Points MTD%","CV Points Projection","CV Points daily required",
+      "CV GAs target","CV GAs MTD","CV GAs MTD%","CV GAs Projection","CV GAs daily required",
       "Consumer Box"
     ]
   },
@@ -75,8 +76,8 @@ const views = {
     title: "EPU",
     cols: [
       "Store",
-      "Points target","Points MTD","Points MTD%","Points Projection","Points daily required",
-      "GAs target","GAs MTD","GAs MTD%","GAs Projection",
+      "EPU Points target","EPU Points MTD","EPU Points MTD%","EPU Points Projection","EPU Points daily required",
+      "EPU GAs target","EPU GAs MTD","EPU GAs MTD%","EPU GAs Projection",
       "EPU Box"
     ]
   },
@@ -108,8 +109,8 @@ const views = {
     title: "Overall",
     cols: [
       "Store",
-      "Points Projection","Consumer Box",
-      "GAs Projection",
+      "CV Points Projection","Consumer Box",
+      "CV GAs Projection",
       "EPU Points Projection","EPU Box",
       "Terminal Projection",
       "AT-Home & Gated Community Box",
