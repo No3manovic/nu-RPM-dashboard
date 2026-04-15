@@ -22,12 +22,12 @@
       font-size:13px;
     }
     th,td {
+      width:100px;
+      min-width:100px;
+      max-width:100px;
       border:1px solid #999;
       padding:5px 4px;
       text-align:center;
-      width:92px;
-      min-width:92px;
-      max-width:92px;
       overflow:hidden;
       white-space:nowrap;
     }
@@ -54,6 +54,7 @@
       animation:spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform:rotate(360deg); } }
+    td:first-child, th:first-child { width:160px; min-width:160px; max-width:160px; white-space:normal; }
   </style>
 </head>
 <body>
