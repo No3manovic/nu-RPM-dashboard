@@ -47,12 +47,18 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9fSQtaOxaFHcdI7A-YcwRhmEqGWBux8WyGZc9CgCtZmOXB/exec";
 let data = [];
+
+// الأعمدة اللي بتتحول لنسبة مئوية (مضروبة في 100)
 const percentCols = [
   "Points MTD%","Points Projection",
   "GAs MTD%","GAs Projection",
   "Terminal MTD%","Terminal Projection",
-  "ADSL MTD%","ADSL Projection"
+  "ADSL MTD%","ADSL Projection",
+  "Consumer Box","EPU Box",
+  "AT-Home & Gated Community Box",
+  "Overall","Final Commission"
 ];
+
 const views = {
   cv: {
     title: "Consumer voice",
@@ -84,7 +90,6 @@ const views = {
     title: "AT-Home & Gated Community",
     cols: [
       "Store",
-      "Points target","Points MTD","Points MTD%","Points daily required",
       "AT-Home & Gated Community Box"
     ]
   },
@@ -97,16 +102,19 @@ const views = {
     ]
   }
 };
+
 function getClass(p){
   if(p < 90) return "red";
   if(p < 100) return "yellow";
   return "green";
 }
+
 async function loadData(){
   const res = await fetch(API_URL);
   const json = await res.json();
   data = json.data;
 }
+
 function renderTable(){
   const v = document.getElementById("view").value;
   const config = views[v];
@@ -115,24 +123,29 @@ function renderTable(){
   thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  const middleCols = config.cols.slice(1, -1);  // كل حاجة غير Store وآخر عمود
+  const middleCols = config.cols.slice(1, -1);
   const lastCol = config.cols[config.cols.length - 1];
 
-  // الصف الأول: Store (rowspan=2) + عنوان القسم + آخر عمود (rowspan=2)
-  let r1 = `<tr>
-    <th rowspan="2">Store</th>
-    <th colspan="${middleCols.length}">${config.title}</th>
-    <th rowspan="2">${lastCol}</th>
-  </tr>`;
-
-  // الصف الثاني: الأعمدة الوسطى بس (Store وآخر عمود متغطيين بالـ rowspan)
-  let r2 = "<tr>";
-  middleCols.forEach(c => {
-    r2 += `<th>${c}</th>`;
-  });
-  r2 += "</tr>";
-
-  thead.innerHTML = r1 + r2;
+  // لو الـ view عنده عمود وسط واحد بس (زي home)، نعرض بدون rowspan
+  if(middleCols.length === 0){
+    let r1 = `<tr>
+      <th>Store</th>
+      <th>${lastCol}</th>
+    </tr>`;
+    thead.innerHTML = r1;
+  } else {
+    let r1 = `<tr>
+      <th rowspan="2">Store</th>
+      <th colspan="${middleCols.length}">${config.title}</th>
+      <th rowspan="2">${lastCol}</th>
+    </tr>`;
+    let r2 = "<tr>";
+    middleCols.forEach(c => {
+      r2 += `<th>${c}</th>`;
+    });
+    r2 += "</tr>";
+    thead.innerHTML = r1 + r2;
+  }
 
   data.forEach(row => {
     let tr = "<tr>";
@@ -149,6 +162,7 @@ function renderTable(){
     tbody.innerHTML += tr;
   });
 }
+
 loadData();
 </script>
 </body>
