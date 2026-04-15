@@ -38,6 +38,7 @@
   <option value="terminal">Terminal</option>
   <option value="home">AT-Home & Gated Community</option>
   <option value="adsl">ADSL GAs</option>
+  <option value="overall">Overall</option>
 </select>
 <button onclick="renderTable()">Show</button>
 <table id="table">
@@ -51,9 +52,10 @@ let data = [];
 const percentCols = [
   "Points MTD%","Points Projection",
   "GAs MTD%","GAs Projection",
+  "EPU Points Projection",
   "Terminal MTD%","Terminal Projection",
-  "ADSL MTD%","ADSL Projection",
   "AT-Home MTD%",
+  "ADSL MTD%","ADSL Projection",
   "Consumer Box","EPU Box",
   "AT-Home & Gated Community Box",
   "Overall","Final Commission"
@@ -100,6 +102,19 @@ const views = {
       "Store",
       "ADSL target","ADSL MTD","ADSL MTD%","ADSL daily required",
       "ADSL Projection"
+    ]
+  },
+  overall: {
+    title: "Overall",
+    cols: [
+      "Store",
+      "Points Projection","Consumer Box",
+      "GAs Projection",
+      "EPU Points Projection","EPU Box",
+      "Terminal Projection",
+      "AT-Home & Gated Community Box",
+      "ADSL Projection",
+      "Overall","Final Commission"
     ]
   }
 };
