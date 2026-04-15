@@ -17,7 +17,7 @@
     table {
       margin:auto;
       border-collapse:collapse;
-      width:100%;
+      table-layout:fixed;
       background:#fff;
       font-size:13px;
     }
@@ -25,12 +25,11 @@
       border:1px solid #999;
       padding:5px 4px;
       text-align:center;
+      width:92px;
+      min-width:92px;
+      max-width:92px;
+      overflow:hidden;
       white-space:nowrap;
-    }
-    td:first-child, th:first-child {
-      white-space:normal;
-      min-width:90px;
-      max-width:130px;
     }
     th { background:#1a56a0; color:#fff; }
     .red { background:red; color:#fff; }
@@ -60,12 +59,12 @@
 <body>
 <h2>RPM Dashboard</h2>
 <select id="view">
+  <option value="overall">Overall</option>
   <option value="cv">Consumer Voice</option>
   <option value="epu">EPU</option>
   <option value="terminal">Terminal</option>
   <option value="home">AT-Home & Gated Community</option>
   <option value="adsl">ADSL GAs</option>
-  <option value="overall">Overall</option>
 </select>
 <button onclick="renderTable()">Show</button>
 
@@ -99,6 +98,21 @@ const percentCols = [
 ];
 
 const views = {
+  overall: {
+    title: "Overall",
+    cols: [
+      "Store",
+      "CV Points Projection",
+      "CV GAs Projection",
+      "Consumer Box",
+      "EPU Points Projection",
+      "EPU Box",
+      "Terminal Projection",
+      "AT-Home & Gated Community Box",
+      "ADSL Projection",
+      "Overall","Final Commission"
+    ]
+  },
   cv: {
     title: "Consumer voice",
     cols: [
@@ -139,21 +153,6 @@ const views = {
       "Store",
       "ADSL target","ADSL MTD","ADSL MTD%","ADSL daily required",
       "ADSL Projection"
-    ]
-  },
-  overall: {
-    title: "Overall",
-    cols: [
-      "Store",
-      "CV Points Projection",
-      "CV GAs Projection",
-      "Consumer Box",
-      "EPU Points Projection",
-      "EPU Box",
-      "Terminal Projection",
-      "AT-Home & Gated Community Box",
-      "ADSL Projection",
-      "Overall","Final Commission"
     ]
   }
 };
