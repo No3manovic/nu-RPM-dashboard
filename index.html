@@ -5,9 +5,7 @@
   <style>
     body { font-family: Arial; background:#f4f6f9; padding:20px; text-align:center; }
     h2 { color:#1a56a0; }
-
     select, button { padding:8px 12px; margin:5px; }
-
     button {
       background:#1a56a0;
       color:#fff;
@@ -15,32 +13,25 @@
       border-radius:5px;
       cursor:pointer;
     }
-
     table {
       margin:auto;
       border-collapse:collapse;
       width:95%;
       background:#fff;
     }
-
     th,td {
       border:1px solid #999;
       padding:6px;
       text-align:center;
     }
-
     th { background:#1a56a0; color:#fff; }
-
     .red { background:red; color:#fff; }
     .yellow { background:yellow; }
     .green { background:green; color:#fff; }
   </style>
 </head>
-
 <body>
-
 <h2>RPM Dashboard</h2>
-
 <select id="view">
   <option value="cv">Consumer Voice</option>
   <option value="epu">EPU</option>
@@ -48,19 +39,14 @@
   <option value="home">AT-Home & Gated Community</option>
   <option value="adsl">ADSL GAs</option>
 </select>
-
 <button onclick="renderTable()">Show</button>
-
 <table id="table">
   <thead></thead>
   <tbody></tbody>
 </table>
-
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9fSQtaOxaFHcdI7A-YcwRhmEqGWBux8WyGZc9CgCtZmOXB/exec";
-
 let data = [];
-
 const percentCols = [
   "Points MTD%","Points Projection",
   "GAs MTD%","GAs Projection",
@@ -68,9 +54,7 @@ const percentCols = [
   "ADSL MTD%","ADSL Projection",
   "AT-Home & Gated Community Box"
 ];
-
 const views = {
-
   cv: {
     title: "Consumer voice",
     cols: [
@@ -80,7 +64,6 @@ const views = {
       "Consumer Box"
     ]
   },
-
   epu: {
     title: "EPU",
     cols: [
@@ -90,7 +73,6 @@ const views = {
       "EPU Box"
     ]
   },
-
   terminal: {
     title: "Terminal",
     cols: [
@@ -99,7 +81,6 @@ const views = {
       "Terminal Projection"
     ]
   },
-
   home: {
     title: "AT-Home & Gated Community",
     cols: [
@@ -108,7 +89,6 @@ const views = {
       "AT-Home & Gated Community Box"
     ]
   },
-
   adsl: {
     title: "ADSL GAs",
     cols: [
@@ -117,53 +97,44 @@ const views = {
       "ADSL Projection"
     ]
   }
-
 };
-
 function getClass(p){
   if(p < 90) return "red";
   if(p < 100) return "yellow";
   return "green";
 }
-
 async function loadData(){
   const res = await fetch(API_URL);
   const json = await res.json();
   data = json.data;
 }
-
 function renderTable(){
   const v = document.getElementById("view").value;
   const config = views[v];
-
   const thead = document.querySelector("#table thead");
   const tbody = document.querySelector("#table tbody");
-
   thead.innerHTML = "";
   tbody.innerHTML = "";
-
   const lastCol = config.cols[config.cols.length - 1];
 
   let r1 = `<tr>
     <th rowspan="2">Store</th>
     <th colspan="${config.cols.length - 2}">${config.title}</th>
-    <th rowspan="2">${lastCol}</th>
   </tr>`;
 
   let r2 = "<tr>";
-  config.cols.slice(1, -1).forEach(c=>{
+  config.cols.slice(1, -1).forEach(c => {
     r2 += `<th>${c}</th>`;
   });
+  r2 += `<th>${lastCol}</th>`;
   r2 += "</tr>";
 
   thead.innerHTML = r1 + r2;
 
-  data.forEach(row=>{
+  data.forEach(row => {
     let tr = "<tr>";
-
-    config.cols.forEach(c=>{
+    config.cols.forEach(c => {
       let val = row[c];
-
       if(percentCols.includes(c) && val !== "" && val != null){
         let pct = val * 100;
         tr += `<td class="${getClass(pct)}">${Math.round(pct)}%</td>`;
@@ -171,14 +142,11 @@ function renderTable(){
         tr += `<td>${val ?? ""}</td>`;
       }
     });
-
     tr += "</tr>";
     tbody.innerHTML += tr;
   });
 }
-
 loadData();
 </script>
-
 </body>
 </html>
