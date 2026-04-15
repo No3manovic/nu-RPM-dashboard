@@ -7,54 +7,16 @@
     .table-wrapper { overflow-x:auto; width:100%; }
     h2 { color:#1a56a0; }
     select, button { padding:8px 12px; margin:5px; }
-    button {
-      background:#1a56a0;
-      color:#fff;
-      border:none;
-      border-radius:5px;
-      cursor:pointer;
-    }
-    table {
-      margin:auto;
-      border-collapse:collapse;
-      table-layout:fixed;
-      background:#fff;
-      font-size:13px;
-    }
-    th,td {
-      width:92px;
-      min-width:92px;
-      max-width:92px;
-      border:1px solid #999;
-      padding:5px 4px;
-      text-align:center;
-      overflow:hidden;
-      white-space:nowrap;
-    }
+    button { background:#1a56a0; color:#fff; border:none; border-radius:5px; cursor:pointer; }
+    table { margin:auto; border-collapse:collapse; table-layout:fixed; background:#fff; font-size:13px; }
+    th,td { border:1px solid #999; padding:5px 4px; text-align:center; overflow:hidden; white-space:nowrap; }
     th { background:#1a56a0; color:#fff; }
     .red { background:red; color:#fff; }
     .yellow { background:yellow; color:#333; }
     .green { background:green; color:#fff; }
-    #loader {
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      padding:40px;
-      gap:16px;
-      color:#1a56a0;
-      font-size:15px;
-    }
-    .spinner {
-      width:40px;
-      height:40px;
-      border:4px solid #c7d9f0;
-      border-top:4px solid #1a56a0;
-      border-radius:50%;
-      animation:spin 0.8s linear infinite;
-    }
+    #loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:16px; color:#1a56a0; font-size:15px; }
+    .spinner { width:40px; height:40px; border:4px solid #c7d9f0; border-top:4px solid #1a56a0; border-radius:50%; animation:spin 0.8s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
-    td:first-child, th:first-child { width:160px; min-width:160px; max-width:160px; white-space:normal; }
   </style>
 </head>
 <body>
@@ -75,10 +37,7 @@
 </div>
 
 <div class="table-wrapper">
-  <table id="table">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
+  <table id="table"></table>
 </div>
 
 <script>
@@ -101,60 +60,27 @@ const percentCols = [
 const views = {
   overall: {
     title: "Overall",
-    cols: [
-      "Store",
-      "CV Points Projection",
-      "CV GAs Projection",
-      "Consumer Box",
-      "EPU Points Projection",
-      "EPU Box",
-      "Terminal Projection",
-      "AT-Home & Gated Community Box",
-      "ADSL Projection",
-      "Overall","Final Commission"
-    ]
+    cols: ["Store","CV Points Projection","CV GAs Projection","Consumer Box","EPU Points Projection","EPU Box","Terminal Projection","AT-Home & Gated Community Box","ADSL Projection","Overall","Final Commission"]
   },
   cv: {
     title: "Consumer voice",
-    cols: [
-      "Store",
-      "CV Points target","CV Points MTD","CV Points MTD%","CV Points Projection","CV Points daily required",
-      "CV GAs target","CV GAs MTD","CV GAs MTD%","CV GAs Projection","CV GAs daily required",
-      "Consumer Box"
-    ]
+    cols: ["Store","CV Points target","CV Points MTD","CV Points MTD%","CV Points Projection","CV Points daily required","CV GAs target","CV GAs MTD","CV GAs MTD%","CV GAs Projection","CV GAs daily required","Consumer Box"]
   },
   epu: {
     title: "EPU",
-    cols: [
-      "Store",
-      "EPU Points target","EPU Points MTD","EPU Points MTD%","EPU Points Projection","EPU Points daily required",
-      "EPU GAs target","EPU GAs MTD","EPU GAs MTD%","EPU GAs Projection",
-      "EPU Box"
-    ]
+    cols: ["Store","EPU Points target","EPU Points MTD","EPU Points MTD%","EPU Points Projection","EPU Points daily required","EPU GAs target","EPU GAs MTD","EPU GAs MTD%","EPU GAs Projection","EPU Box"]
   },
   terminal: {
     title: "Terminal",
-    cols: [
-      "Store",
-      "Terminal target","Terminal MTD","Terminal MTD%","Terminal daily required",
-      "Terminal Projection"
-    ]
+    cols: ["Store","Terminal target","Terminal MTD","Terminal MTD%","Terminal daily required","Terminal Projection"]
   },
   home: {
     title: "AT-Home & Gated Community",
-    cols: [
-      "Store",
-      "AT-Home target","AT-Home MTD","AT-Home MTD%","AT-Home daily required",
-      "AT-Home & Gated Community Box"
-    ]
+    cols: ["Store","AT-Home target","AT-Home MTD","AT-Home MTD%","AT-Home daily required","AT-Home & Gated Community Box"]
   },
   adsl: {
     title: "ADSL GAs",
-    cols: [
-      "Store",
-      "ADSL target","ADSL MTD","ADSL MTD%","ADSL daily required",
-      "ADSL Projection"
-    ]
+    cols: ["Store","ADSL target","ADSL MTD","ADSL MTD%","ADSL daily required","ADSL Projection"]
   }
 };
 
@@ -179,26 +105,23 @@ async function loadData(){
 function renderTable(){
   const v = document.getElementById("view").value;
   const config = views[v];
-  const thead = document.querySelector("#table thead");
-  const tbody = document.querySelector("#table tbody");
-  thead.innerHTML = "";
-  tbody.innerHTML = "";
+  const table = document.getElementById("table");
+  table.innerHTML = "";
+
+  // colgroup — Store=160px، باقي=92px
+  let colgroup = "<colgroup>";
+  config.cols.forEach((c, i) => {
+    colgroup += `<col style="width:${i === 0 ? 160 : 92}px">`;
+  });
+  colgroup += "</colgroup>";
 
   const middleCols = config.cols.slice(1, -1);
   const lastCol = config.cols[config.cols.length - 1];
 
-  let r1 = `<tr>
-    <th rowspan="2">Store</th>
-    <th colspan="${middleCols.length}">${config.title}</th>
-    <th rowspan="2">${lastCol}</th>
-  </tr>`;
-  let r2 = "<tr>";
-  middleCols.forEach(c => {
-    r2 += `<th>${c}</th>`;
-  });
-  r2 += "</tr>";
-  thead.innerHTML = r1 + r2;
+  let r1 = `<tr><th rowspan="2">Store</th><th colspan="${middleCols.length}">${config.title}</th><th rowspan="2">${lastCol}</th></tr>`;
+  let r2 = "<tr>" + middleCols.map(c => `<th>${c}</th>`).join("") + "</tr>";
 
+  let rows = "";
   data.forEach(row => {
     let tr = "<tr>";
     config.cols.forEach(c => {
@@ -211,8 +134,10 @@ function renderTable(){
       }
     });
     tr += "</tr>";
-    tbody.innerHTML += tr;
+    rows += tr;
   });
+
+  table.innerHTML = colgroup + `<thead>${r1}${r2}</thead><tbody>${rows}</tbody>`;
 }
 
 loadData();
