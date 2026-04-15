@@ -4,6 +4,7 @@
   <title>RPM Dashboard</title>
   <style>
     body { font-family: Arial; background:#f4f6f9; padding:20px; text-align:center; }
+    .table-wrapper { overflow-x:auto; width:100%; }
     h2 { color:#1a56a0; }
     select, button { padding:8px 12px; margin:5px; }
     button {
@@ -16,17 +17,24 @@
     table {
       margin:auto;
       border-collapse:collapse;
-      width:95%;
+      width:100%;
       background:#fff;
+      font-size:13px;
     }
     th,td {
       border:1px solid #999;
-      padding:6px;
+      padding:5px 4px;
       text-align:center;
+      white-space:nowrap;
+    }
+    td:first-child, th:first-child {
+      white-space:normal;
+      min-width:90px;
+      max-width:130px;
     }
     th { background:#1a56a0; color:#fff; }
     .red { background:red; color:#fff; }
-    .yellow { background:yellow; }
+    .yellow { background:yellow; color:#333; }
     .green { background:green; color:#fff; }
   </style>
 </head>
@@ -41,10 +49,10 @@
   <option value="overall">Overall</option>
 </select>
 <button onclick="renderTable()">Show</button>
-<table id="table">
+<div class="table-wrapper"><table id="table">
   <thead></thead>
   <tbody></tbody>
-</table>
+</table></div>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9fSQtaOxaFHcdI7A-YcwRhmEqGWBux8WyGZc9CgCtZmOXB/exec";
 let data = [];
@@ -132,6 +140,7 @@ async function loadData(){
   const res = await fetch(API_URL);
   const json = await res.json();
   data = json.data;
+  renderTable();
 }
 
 function renderTable(){
