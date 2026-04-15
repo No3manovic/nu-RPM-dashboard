@@ -51,8 +51,7 @@ const percentCols = [
   "Points MTD%","Points Projection",
   "GAs MTD%","GAs Projection",
   "Terminal MTD%","Terminal Projection",
-  "ADSL MTD%","ADSL Projection",
-  "AT-Home & Gated Community Box"
+  "ADSL MTD%","ADSL Projection"
 ];
 const views = {
   cv: {
@@ -115,18 +114,22 @@ function renderTable(){
   const tbody = document.querySelector("#table tbody");
   thead.innerHTML = "";
   tbody.innerHTML = "";
+
+  const middleCols = config.cols.slice(1, -1);  // كل حاجة غير Store وآخر عمود
   const lastCol = config.cols[config.cols.length - 1];
 
+  // الصف الأول: Store (rowspan=2) + عنوان القسم + آخر عمود (rowspan=2)
   let r1 = `<tr>
     <th rowspan="2">Store</th>
-    <th colspan="${config.cols.length - 2}">${config.title}</th>
+    <th colspan="${middleCols.length}">${config.title}</th>
+    <th rowspan="2">${lastCol}</th>
   </tr>`;
 
+  // الصف الثاني: الأعمدة الوسطى بس (Store وآخر عمود متغطيين بالـ rowspan)
   let r2 = "<tr>";
-  config.cols.slice(1, -1).forEach(c => {
+  middleCols.forEach(c => {
     r2 += `<th>${c}</th>`;
   });
-  r2 += `<th>${lastCol}</th>`;
   r2 += "</tr>";
 
   thead.innerHTML = r1 + r2;
