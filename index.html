@@ -48,12 +48,12 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyMkUxhW4ZUjVDcp8CB_X9fSQtaOxaFHcdI7A-YcwRhmEqGWBux8WyGZc9CgCtZmOXB/exec";
 let data = [];
 
-// الأعمدة اللي بتتحول لنسبة مئوية (مضروبة في 100)
 const percentCols = [
   "Points MTD%","Points Projection",
   "GAs MTD%","GAs Projection",
   "Terminal MTD%","Terminal Projection",
   "ADSL MTD%","ADSL Projection",
+  "AT-Home MTD%",
   "Consumer Box","EPU Box",
   "AT-Home & Gated Community Box",
   "Overall","Final Commission"
@@ -90,6 +90,7 @@ const views = {
     title: "AT-Home & Gated Community",
     cols: [
       "Store",
+      "AT-Home target","AT-Home MTD","AT-Home MTD%","AT-Home daily required",
       "AT-Home & Gated Community Box"
     ]
   },
@@ -126,26 +127,17 @@ function renderTable(){
   const middleCols = config.cols.slice(1, -1);
   const lastCol = config.cols[config.cols.length - 1];
 
-  // لو الـ view عنده عمود وسط واحد بس (زي home)، نعرض بدون rowspan
-  if(middleCols.length === 0){
-    let r1 = `<tr>
-      <th>Store</th>
-      <th>${lastCol}</th>
-    </tr>`;
-    thead.innerHTML = r1;
-  } else {
-    let r1 = `<tr>
-      <th rowspan="2">Store</th>
-      <th colspan="${middleCols.length}">${config.title}</th>
-      <th rowspan="2">${lastCol}</th>
-    </tr>`;
-    let r2 = "<tr>";
-    middleCols.forEach(c => {
-      r2 += `<th>${c}</th>`;
-    });
-    r2 += "</tr>";
-    thead.innerHTML = r1 + r2;
-  }
+  let r1 = `<tr>
+    <th rowspan="2">Store</th>
+    <th colspan="${middleCols.length}">${config.title}</th>
+    <th rowspan="2">${lastCol}</th>
+  </tr>`;
+  let r2 = "<tr>";
+  middleCols.forEach(c => {
+    r2 += `<th>${c}</th>`;
+  });
+  r2 += "</tr>";
+  thead.innerHTML = r1 + r2;
 
   data.forEach(row => {
     let tr = "<tr>";
